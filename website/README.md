@@ -1,1 +1,0 @@
-# Wikipedia written in typescript!
