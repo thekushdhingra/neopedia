@@ -658,6 +658,20 @@ figure:nth-of-type(even) {
     }
 }
 
+button {
+    color: var(--text);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+}
+
+.search-card {
+    transition: border .2s ease-in-out;
+}
+
+.search-card:hover {
+    border-color: #0645ad;
+}
+
 @media (max-width: 768px) {
 
     .infobox-image img,
