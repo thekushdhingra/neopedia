@@ -4,6 +4,8 @@ Neopedia is a modern, open-source encyclopedia platform built with TypeScript an
 
 ### Visit https://neopedia.kushs.dev
 
+#### API for infoboxes at https://neopedia.kushs.dev?query=
+where you pass the query to get the html :)
 ## Contributing
 
 Contributions are welcome! Please open issues or submit pull requests to help improve Neopedia.
