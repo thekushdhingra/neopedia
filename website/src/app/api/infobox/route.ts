@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query")?.toLowerCase();
@@ -54,11 +59,6 @@ export async function GET(request: NextRequest) {
     data[0];
 
   const rawHTML = bestMatch.html;
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
 
   if (!rawHTML) {
     console.warn("⚠️ First article has no HTML field");
