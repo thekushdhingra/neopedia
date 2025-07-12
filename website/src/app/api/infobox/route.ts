@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     console.warn("⚠️ No query param provided");
     return new Response(JSON.stringify({ error: "Missing query param" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...corsHeaders,},
     });
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     console.error("❌ Supabase error:", error.message);
     return new Response(JSON.stringify({ error: "Supabase query failed" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...corsHeaders,},
     });
   }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       JSON.stringify({ error: "No matching articles found" }),
       {
         status: 404,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...corsHeaders,},
       }
     );
   }
@@ -54,6 +54,11 @@ export async function GET(request: NextRequest) {
     data[0];
 
   const rawHTML = bestMatch.html;
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 
   if (!rawHTML) {
     console.warn("⚠️ First article has no HTML field");
@@ -61,7 +66,7 @@ export async function GET(request: NextRequest) {
       JSON.stringify({ error: "Article does not contain HTML content" }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...corsHeaders,},
       }
     );
   }
@@ -75,13 +80,13 @@ export async function GET(request: NextRequest) {
       JSON.stringify({ error: "No .infobox found in article" }),
       {
         status: 404,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...corsHeaders,},
       }
     );
   }
-
+  
   return new Response($.html(infobox), {
     status: 200,
-    headers: { "Content-Type": "text/html" },
+    headers: { "Content-Type": "text/html", ...corsHeaders,},
   });
 }
