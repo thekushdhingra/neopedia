@@ -6,20 +6,20 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query")?.toLowerCase();
 
   if (!query) {
-    console.warn("⚠️ No query param provided");
     return new Response(JSON.stringify({ error: "Missing query param" }), {
       status: 400,
-      headers: { "Content-Type": "application/json", ...corsHeaders,},
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
 
@@ -30,27 +30,21 @@ export async function GET(request: NextRequest) {
     .limit(10);
 
   if (error) {
-    console.error("❌ Supabase error:", error.message);
     return new Response(JSON.stringify({ error: "Supabase query failed" }), {
       status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders,},
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
 
   if (!data || data.length === 0) {
-    console.warn("⚠️ No matching articles found");
     return new Response(
       JSON.stringify({ error: "No matching articles found" }),
       {
         status: 404,
-        headers: { "Content-Type": "application/json", ...corsHeaders,},
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   }
-
-  data.forEach((obj) => {
-    console.log(obj.slug);
-  });
 
   const bestMatch =
     data.find((item) => item.slug === query) ||
@@ -61,12 +55,11 @@ export async function GET(request: NextRequest) {
   const rawHTML = bestMatch.html;
 
   if (!rawHTML) {
-    console.warn("⚠️ First article has no HTML field");
     return new Response(
       JSON.stringify({ error: "Article does not contain HTML content" }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders,},
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   }
@@ -75,18 +68,47 @@ export async function GET(request: NextRequest) {
   const infobox = $(".infobox").first();
 
   if (!infobox.length) {
-    console.warn("🚫 No .infobox found in the HTML content");
     return new Response(
       JSON.stringify({ error: "No .infobox found in article" }),
       {
         status: 404,
-        headers: { "Content-Type": "application/json", ...corsHeaders,},
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   }
-  
-  return new Response($.html(infobox), {
+
+  const infoboxJSON: Record<string, any> = {};
+  const rows = infobox.find("tr");
+
+  rows.each((_, el) => {
+    const $row = $(el);
+    const th = $row.find("th").first().text().trim();
+    const td = $row.find("td").first();
+
+    if (!th || !td.length) return;
+
+    let value: string | string[];
+    const listItems = td.find("li");
+
+    if (listItems.length) {
+      value = listItems.map((_, li) => $(li).text().trim()).get();
+    } else {
+      value = td.text().trim();
+    }
+
+    infoboxJSON[th] = value;
+  });
+
+  const title = infobox.find(".infobox-above").first().text().trim();
+  if (title) infoboxJSON["Title"] = title;
+
+  const image = infobox.find("img").first().attr("src");
+  if (image) {
+    infoboxJSON["Image"] = image.startsWith("http") ? image : `https:${image}`;
+  }
+
+  return new Response(JSON.stringify(infoboxJSON, null, 2), {
     status: 200,
-    headers: { "Content-Type": "text/html", ...corsHeaders,},
+    headers: { "Content-Type": "application/json", ...corsHeaders },
   });
 }
