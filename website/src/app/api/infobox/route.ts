@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return new Response(infobox.html(), {
+  return new Response($.html(infobox), {
     status: 200,
     headers: { "Content-Type": "text/html" },
   });
