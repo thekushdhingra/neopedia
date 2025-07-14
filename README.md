@@ -1,7 +1,5 @@
 # Neopedia
 
-Time Spent working on this: ![Time from Wakatime](https://hackatime-badge.hackclub.com/U0804SUGQRG/neopedia)
-
 Neopedia is a modern, open-source encyclopedia platform built with TypeScript and Python. It aims to provide a fast, collaborative, and extensible alternative to traditional encyclopedias.
 
 ### Visit https://neopedia.kushs.dev
